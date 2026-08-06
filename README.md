@@ -100,7 +100,7 @@ The Pi needs an internet connection of its own — use its Wi-Fi or connect it t
 sudo apt update
 sudo apt install -y python3-pip dnsmasq
 git clone https://github.com/jstubbins98-netize/Rewind-Proxy.git
-cd rewind-proxy/rewind-proxy
+cd ~/rewind-proxy
 pip3 install -r requirements.txt
 ```
 
