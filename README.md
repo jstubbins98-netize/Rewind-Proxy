@@ -66,14 +66,15 @@ python run.py
 The proxy starts on `0.0.0.0:8080`. Open `http://<this-machine-ip>:8080/` in any browser to reach the home page, or configure your browser's HTTP proxy settings to point to this machine.
 
 ```
-python run.py --host 0.0.0.0 --port 8080 --debug
+python run.py --host 0.0.0.0 --port 8080 --headless --debug
 ```
 
-| Option    | Default   | Description               |
-|-----------|-----------|---------------------------|
-| `--host`  | `0.0.0.0` | Bind address              |
-| `--port`  | `8080`    | Port to listen on         |
-| `--debug` | off       | Verbose debug logging     |
+| Option       | Default   | Description                                                    |
+|--------------|-----------|----------------------------------------------------------------|
+| `--host`     | `0.0.0.0` | Bind address                                                   |
+| `--port`     | `8080`    | Port to listen on                                              |
+| `--headless` | off       | Disable the web UI; serve only a plain-text status at `/`      |
+| `--debug`    | off       | Verbose debug logging                                          |
 
 ---
 
@@ -99,8 +100,8 @@ The Pi needs an internet connection of its own — use its Wi-Fi or connect it t
 # On the Pi:
 sudo apt update
 sudo apt install -y python3-pip dnsmasq
-git clone https://github.com/jstubbins98-netize/Rewind-Proxy.git
-cd ~/rewind-proxy
+git clone https://github.com/your-username/rewind-proxy.git
+cd rewind-proxy/rewind-proxy
 pip3 install -r requirements.txt
 ```
 
@@ -192,7 +193,9 @@ From there, use the form to browse to any site and choose any date from 1996 onw
 
 ### Running at Boot (optional)
 
-To start Rewind-Proxy automatically when the Pi powers on, create a systemd service:
+To start Rewind-Proxy automatically when the Pi powers on, create a systemd service.
+
+**Normal mode** (home page enabled):
 
 ```bash
 sudo nano /etc/systemd/system/rewind-proxy.service
@@ -205,6 +208,23 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/python3 /home/pi/rewind-proxy/rewind-proxy/run.py
+WorkingDirectory=/home/pi/rewind-proxy/rewind-proxy
+Restart=on-failure
+User=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Headless mode** (recommended for always-on Pi service — no web UI overhead):
+
+```ini
+[Unit]
+Description=Rewind-Proxy (headless)
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/rewind-proxy/rewind-proxy/run.py --headless
 WorkingDirectory=/home/pi/rewind-proxy/rewind-proxy
 Restart=on-failure
 User=root
@@ -230,6 +250,54 @@ http://192.168.100.1:8080/
 ```
 
 Use the **URL form** to enter any site address and pick a date. The page is served directly through the proxy — the old browser never needs proxy settings configured, and the address bar never shows `archive.org` URLs.
+
+---
+
+## Headless Mode
+
+Headless mode disables the web UI entirely — no home page, no quick links, no setup guide. The proxy still works in full; you just configure the old browser's proxy settings and browse normally. The only thing served at `/` is a brief plain-text status block.
+
+```bash
+python run.py --headless
+sudo python run.py --headless          # Pi 5 with full dnsmasq auto-setup
+```
+
+**Startup banner in headless mode:**
+
+```
+============================================================
+  Rewind-Proxy started  [HEADLESS]  (local network...)
+
+  Web UI disabled. Configure your browser's proxy settings:
+  Proxy host : 192.168.100.1
+  Proxy port : 8080
+
+  Status endpoint: http://192.168.100.1:8080/
+============================================================
+```
+
+**Status endpoint (`/`)** — a monitoring tool or `curl` can hit this to confirm the proxy is alive:
+
+```
+Rewind-Proxy [headless]  (local network — make sure port is not firewalled)
+Time        : 2026-08-07 21:00:00 UTC
+Proxy host  : 192.168.100.1
+Proxy port  : 8080
+Pi ethernet : old computer connected at 192.168.100.12
+```
+
+**`/setup`** — returns brief plain-text proxy connection details instead of the full HTML guide.
+
+**Everything else is unchanged** — `/go`, `/r`, and standard browser proxy mode all work exactly as in normal mode. The only difference is that the old computer cannot use the form-based home page and must have browser proxy settings configured.
+
+### When to use headless mode
+
+| Scenario | Recommendation |
+|---|---|
+| Pi running as a always-on background service (systemd, no keyboard/monitor) | **Headless** — no UI overhead, status endpoint still works for `curl` health checks |
+| Pi with a monitor where you occasionally want to use the home page from a modern browser | Normal mode |
+| Laptop or desktop running Rewind-Proxy for a one-off session | Normal mode |
+| Automated/scripted deployment where you want minimal attack surface | **Headless** |
 
 ---
 
