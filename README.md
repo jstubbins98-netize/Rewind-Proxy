@@ -4,7 +4,7 @@ A web proxy server that lets **old computers from the 1990s and 2000s browse the
 
 Old browsers (Netscape Navigator, Internet Explorer 5/6, early Opera, iCab) cannot connect to any modern website — they lack TLS 1.2/1.3, their certificate stores are stale, and modern security headers crash them. Rewind-Proxy sits in the middle: it speaks plain HTTP/1.0 to the old browser and handles all the modern HTTPS and TLS itself, then serves back a cleaned-up archived page from the era you want.
 
-The intended setup is a **Raspberry Pi 5** plugged directly into the old computer with an ethernet cable — no router, no network switch needed. The Pi handles everything and automatically configures the link.
+The intended setup is a **Linux computer** plugged directly into the old computer with an ethernet cable — no router or network switch needed. A Raspberry Pi 5 is one supported option, but a Linux laptop, desktop, mini PC, or server works too.
 
 ---
 
@@ -39,7 +39,7 @@ For every request the proxy:
 - Two usage modes: **browser proxy settings** (type any URL in the address bar) and **direct home page** (open `http://pi-ip:8080/` and use the form)
 - Date picker on the home page — choose any year from 1996 to the present
 - Quick links to popular 1990s/2000s sites (Yahoo!, Google, BBC, CNN, Wikipedia, GeoCities, AltaVista, Ask Jeeves)
-- **Raspberry Pi 5 ethernet wizard** — detects Pi 5 hardware, configures the ethernet interface with a static IP, optionally runs a DHCP server so the old computer gets an address automatically, and shows live connection status on the home page
+- **Automatic Linux ethernet wizard** — selects a safe wired port, protects the host's default-route interface, configures a private static IP, installs/runs dnsmasq for DHCP, and shows live connection status
 - Strips `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, and all other headers that crash old browsers
 - Fixes gzip encoding issues (decompresses before forwarding so old browsers don't see raw compressed data)
 - Threaded server — handles multiple requests simultaneously
@@ -51,7 +51,7 @@ For every request the proxy:
 - Python 3.10 or later
 - `pip install -r requirements.txt` (installs `requests` and `beautifulsoup4`)
 - Internet connection on the machine running the proxy
-- For the Pi 5 ethernet wizard: `sudo` access and optionally `dnsmasq` installed
+- For automatic Linux ethernet setup: Linux, `sudo` access, and a wired port not carrying the host's default internet route
 
 ---
 
@@ -59,34 +59,57 @@ For every request the proxy:
 
 ```bash
 cd rewind-proxy
-pip install -r requirements.txt
-python run.py
+chmod +x setup.sh
+./setup.sh
+./venv/bin/python run.py
 ```
 
 The proxy starts on `0.0.0.0:8080`. Open `http://<this-machine-ip>:8080/` in any browser to reach the home page, or configure your browser's HTTP proxy settings to point to this machine.
 
 ```
-python run.py --host 0.0.0.0 --port 8080 --headless --debug
+./venv/bin/python run.py --host 0.0.0.0 --port 8080 --interface enp3s0 --headless --debug
 ```
 
 | Option       | Default   | Description                                                    |
 |--------------|-----------|----------------------------------------------------------------|
 | `--host`     | `0.0.0.0` | Bind address                                                   |
 | `--port`     | `8080`    | Port to listen on                                              |
+| `--interface NAME` | auto | Wired Linux interface for the old computer, such as `eth0` or `enp3s0` |
 | `--headless` | off       | Disable the web UI; serve only a plain-text status at `/`      |
 | `--debug`    | off       | Verbose debug logging                                          |
 
+On Linux, Rewind-Proxy automatically selects a wired interface that is not
+carrying the default internet route. This prevents it from replacing the IP
+address on the interface the host is using for internet access. If more than
+one suitable wired port exists, select one explicitly with `--interface`.
+
+Examples:
+
+```bash
+# Automatically select a safe wired port
+sudo ./venv/bin/python run.py
+
+# Use a specific wired port
+sudo ./venv/bin/python run.py --interface enp3s0
+
+# Generic Linux host in headless mode
+sudo ./venv/bin/python run.py --interface eth0 --headless
+```
+
+The automatic dnsmasq installer supports `apt`, `dnf`, `yum`, `zypper`,
+`pacman`, and `apk`.
+
 ---
 
-## Raspberry Pi 5 Setup — Full Guide
+## Linux Ethernet Setup — Full Guide
 
-This is the main intended use case. The Pi 5 runs Rewind-Proxy and bridges directly to the old computer over a single ethernet cable. No router, no switch, no Wi-Fi needed on the old machine.
+The Linux host runs Rewind-Proxy and connects directly to the old computer over a single ethernet cable. The host needs a separate internet connection, normally Wi-Fi or a second network adapter. No Wi-Fi is needed on the old machine.
 
 ### What You Need
 
 | Item | Notes |
 |------|-------|
-| Raspberry Pi 5 | Any RAM size; running Raspberry Pi OS (Bookworm) recommended |
+| Linux host | Raspberry Pi 5, laptop, desktop, mini PC, or server |
 | Ethernet cable | Standard Cat 5e/Cat 6 straight-through cable |
 | The old computer | Any machine with a working ethernet port and a browser with proxy settings |
 | Power for the Pi | USB-C power supply |
@@ -94,27 +117,29 @@ This is the main intended use case. The Pi 5 runs Rewind-Proxy and bridges direc
 
 The Pi needs an internet connection of its own — use its Wi-Fi or connect it to your router with a second ethernet cable (if your Pi has only one port, Wi-Fi for internet + ethernet for the old computer is the typical setup).
 
-### Step 1 — Install Rewind-Proxy on the Pi
+### Step 1 — Install Rewind-Proxy on the Linux Host
 
 ```bash
-# On the Pi:
+# On Debian, Ubuntu, or Raspberry Pi OS:
 sudo apt update
 sudo apt install -y python3-pip dnsmasq
-git clone https://github.com/jstubbins98-netize/Rewind-Proxy.git
+git clone https://github.com/your-username/rewind-proxy.git
 cd rewind-proxy/rewind-proxy
 pip3 install -r requirements.txt
 ```
 
-> **dnsmasq** is optional but recommended — it gives the old computer an IP address automatically over DHCP so you don't have to configure it manually.
+> Rewind-Proxy installs dnsmasq automatically when it is missing and the
+> program is running as root. Supported package managers are apt, dnf, yum,
+> zypper, pacman, and apk.
 
 ### Step 2 — Run the Proxy (as root for full auto-setup)
 
 ```bash
-sudo python3 run.py
+sudo ./venv/bin/python run.py
 ```
 
 Running as `root` lets the proxy:
-- Assign a static IP (`192.168.100.1`) to the Pi's ethernet interface automatically
+- Assign a static IP (`192.168.100.1`) to the selected Linux ethernet interface automatically
 - Start `dnsmasq` to hand out IP addresses via DHCP
 
 If you run **without** `sudo`, the proxy still works but prints the `ip` commands you need to run manually and shows them on the home page.
@@ -133,8 +158,8 @@ On startup you will see:
   Proxy port : 8080
   Then browse any http:// URL normally.
 ============================================================
-  Raspberry Pi 5 detected!
-  Connect your old computer's ethernet cable to the Pi.
+  Linux ethernet setup enabled on eth0.
+  Connect your old computer to that ethernet port.
   The home page will show live setup instructions.
 ============================================================
 ```
@@ -207,7 +232,7 @@ Description=Rewind-Proxy
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/rewind-proxy/rewind-proxy/run.py
+ExecStart=/home/pi/rewind-proxy/rewind-proxy/venv/bin/python /home/pi/rewind-proxy/rewind-proxy/run.py
 WorkingDirectory=/home/pi/rewind-proxy/rewind-proxy
 Restart=on-failure
 User=root
@@ -224,7 +249,7 @@ Description=Rewind-Proxy (headless)
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/rewind-proxy/rewind-proxy/run.py --headless
+ExecStart=/home/pi/rewind-proxy/rewind-proxy/venv/bin/python /home/pi/rewind-proxy/rewind-proxy/run.py --headless
 WorkingDirectory=/home/pi/rewind-proxy/rewind-proxy
 Restart=on-failure
 User=root
@@ -258,8 +283,8 @@ Use the **URL form** to enter any site address and pick a date. The page is serv
 Headless mode disables the web UI entirely — no home page, no quick links, no setup guide. The proxy still works in full; you just configure the old browser's proxy settings and browse normally. The only thing served at `/` is a brief plain-text status block.
 
 ```bash
-python run.py --headless
-sudo python run.py --headless          # Pi 5 with full dnsmasq auto-setup
+./venv/bin/python run.py --headless
+sudo ./venv/bin/python run.py --headless
 ```
 
 **Startup banner in headless mode:**
@@ -311,7 +336,7 @@ Pi ethernet : old computer connected at 192.168.100.12
 | `proxy.py` | HTTP server, request routing, two modes (direct + browser-proxy) |
 | `rewriter.py` | HTML/CSS rewriter — rewrites links, strips Wayback toolbar, adds info bar |
 | `wayback.py` | Wayback Machine client — snapshot resolution, HTTP fetching |
-| `pi_setup.py` | Pi 5 ethernet wizard — hardware detection, network config, DHCP, ARP monitor |
+| `pi_setup.py` | Linux ethernet wizard — safe interface selection, network config, DHCP, ARP monitor |
 | `config.py` | All tuneable constants |
 
 ### Two Usage Modes
