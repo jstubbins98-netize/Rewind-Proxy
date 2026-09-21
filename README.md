@@ -123,7 +123,7 @@ The Pi needs an internet connection of its own — use its Wi-Fi or connect it t
 # On Debian, Ubuntu, or Raspberry Pi OS:
 sudo apt update
 sudo apt install -y python3-pip dnsmasq
-git clone https://github.com/your-username/rewind-proxy.git
+git clone https://github.com/jstubbins98-netize/Rewind-Proxy.git
 cd rewind-proxy/rewind-proxy
 pip3 install -r requirements.txt
 ```
