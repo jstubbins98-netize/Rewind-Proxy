@@ -2,7 +2,8 @@
 
 A web proxy server that lets old computers from the 1990s and 2000s browse the internet by routing every request through the [Internet Archive Wayback Machine](https://web.archive.org/).  
 Old browsers (Netscape Navigator, Internet Explorer 5/6, early Opera, iCab) cannot connect to any modern website — they lack TLS 1.2/1.3, their certificate stores are stale, and modern security headers crash them. Rewind-Proxy sits in the middle: it speaks plain HTTP/1.0 to the old browser and handles all the modern HTTPS and TLS itself, then serves back a cleaned-up archived page from the era you want.  
-The intended setup is a Linux computer plugged directly into the old computer with an ethernet cable — no router or network switch needed. A Raspberry Pi 5 is one supported option, but a Linux laptop, desktop, mini PC, or server works too.  
+The intended setup is a Linux computer plugged directly into the old computer with an ethernet cable — no router or network switch needed. A Raspberry Pi 5 is one supported option, but a Linux laptop, desktop, mini PC, or server works too.
+
 ---
 
 ## **How It Works**
@@ -206,7 +207,8 @@ User=root
 WantedBy=multi-user.target  
 sudo systemctl daemon-reload  
 sudo systemctl enable rewind-proxy  
-sudo systemctl start rewind-proxy  
+sudo systemctl start rewind-proxy
+
 ---
 
 ## **Using the Home Page (Direct Mode)**
@@ -291,7 +293,8 @@ Old browser says "Unable to connect" or the proxy just hangs
 Pages load but images are missing Normal — the Wayback Machine only archived what its crawler found. Not every image from every page was captured.  
 Safari / old Mac browser says "cannot decode raw data" This is the gzip Content-Encoding header bug. It was fixed in this proxy — make sure you are running the latest version.  
 Browser shows a blank page or "This page cannot be displayed"Some pages are very large or have encoding the old browser can't handle. Try a different date — earlier snapshots are often simpler and lighter.  
-The address bar shows web.archive.org URLs Make sure you are running the latest version of the proxy. Old versions used a different link rewriting strategy; the current version keeps all links on the proxy's own address.  
+The address bar shows web.archive.org URLs Make sure you are running the latest version of the proxy. Old versions used a different link rewriting strategy; the current version keeps all links on the proxy's own address.
+
 ---
 
 ## **Limitations**
