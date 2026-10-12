@@ -13,7 +13,7 @@ Old browser ── plain HTTP/1.0 ──► Rewind-Proxy :8080
 1. Find best Wayback snapshot  
 2. Fetch over modern HTTPS/TLS  
 3. Rewrite all links → back through proxy  
-4. Strip Wayback toolbar \+ modern headers  
+4. Strip Wayback toolbar + modern headers  
 │  
 ▼  
 Clean archived HTML served  
@@ -45,7 +45,7 @@ For every request the proxy:
 ## **Requirements**
 ```
 * Python 3.10 or later  
-* pip install \-r requirements.txt (installs requests and beautifulsoup4)  
+* pip install -r requirements.txt (installs requests and beautifulsoup4)  
 * Internet connection on the machine running the proxy  
 * For automatic Linux ethernet setup: Linux, sudo access, and a wired port not carrying the host's default internet route
 ```
@@ -54,7 +54,7 @@ For every request the proxy:
 ## **Quick Start (any machine)**
 ```
 cd rewind-proxy  
-chmod \+x setup.sh  
+chmod +x setup.sh  
 ./setup.sh  
 ./venv/bin/python run.py
 ```
@@ -100,12 +100,12 @@ The Linux host needs an internet connection of its own — use its Wi-Fi or conn
 
 ### **Step 1 — Install Rewind-Proxy on the Linux Host**
 ```
-\# On Debian, Ubuntu, or Raspberry Pi OS:  
+# On Debian, Ubuntu, or Raspberry Pi OS:  
 sudo apt update  
-sudo apt install \-y python3-pip dnsmasq  
-git clone https\://github.com/jstubbins98-netize/Rewind-Proxy.git  
+sudo apt install -y python3-pip dnsmasq  
+git clone https://github.com/jstubbins98-netize/Rewind-Proxy.git  
 cd rewind-proxy/rewind-proxy  
-pip3 install \-r requirements.txt
+pip3 install -r requirements.txt
 ```
 Rewind-Proxy installs dnsmasq automatically when it is missing and the program is running as root. Supported package managers are apt, dnf, yum, zypper, pacman, and apk.
 
@@ -121,19 +121,19 @@ Running as root lets the proxy:
 If you run without sudo, the proxy still works but prints the ip commands you need to run manually and shows them on the home page.  
 On startup you will see:
 ```
-\============================================================  
+============================================================  
 Rewind-Proxy started (local network — make sure port is not firewalled)  
 Open this URL in any browser:  
-\>\>\> http\://192.168.100.1:8080/ \<\<\<  
+>>> http\://192.168.100.1:8080/ <<<  
 — OR — configure your old browser's proxy settings:  
 Proxy host : 192.168.100.1  
 Proxy port : 8080  
-Then browse any http\:// URL normally.  
-\============================================================  
+Then browse any http:// URL normally.  
+============================================================  
 Linux ethernet setup enabled on eth0.  
 Connect your old computer to that ethernet port.  
 The home page will show live setup instructions.  
-\============================================================
+============================================================
 ```
 ### **Step 3 — Connect the Old Computer to the Linux Host**
 
@@ -179,41 +179,10 @@ Browser-specific instructions:
 With the proxy configured, type any URL in the old browser's address bar and press Enter. Rewind-Proxy will find and serve the nearest archived version from the year 2000 by default.  
 You can also open the home page directly:
 ```
-http\://192.168.100.1:8080/
+http://192.168.100.1:8080/
 ```
 From there, use the form to browse to any site and choose any date from 1996 onwards. Quick links take you straight to classic 1990s/2000s websites.
 
-### **Running at Boot (optional)**
-
-To start Rewind-Proxy automatically when the Linux system powers on, create a systemd service. 
-```
-Normal mode (home page enabled):  
-sudo nano /etc/systemd/system/rewind-proxy.service  
-\[Unit\]  
-Description=Rewind-Proxy  
-After=network.target  
-\[Service\]  
-ExecStart=/home/pi/rewind-proxy/rewind-proxy/venv/bin/python /home/pi/rewind-proxy/rewind-proxy/run.py  
-WorkingDirectory=/home/pi/rewind-proxy/rewind-proxy  
-Restart=on-failure  
-User=root  
-\[Install\]  
-WantedBy=multi-user.target  
-Headless mode (recommended for always-on Pi service — no web UI overhead):  
-\[Unit\]  
-Description=Rewind-Proxy (headless)  
-After=network.target  
-\[Service\]  
-ExecStart=/home/pi/rewind-proxy/rewind-proxy/venv/bin/python /home/pi/rewind-proxy/rewind-proxy/run.py \--headless  
-WorkingDirectory=/home/pi/rewind-proxy/rewind-proxy  
-Restart=on-failure  
-User=root  
-\[Install\]  
-WantedBy=multi-user.target  
-sudo systemctl daemon-reload  
-sudo systemctl enable rewind-proxy  
-sudo systemctl start rewind-proxy
-```
 ---
 
 ## **Using the Home Page (Direct Mode)**
@@ -233,15 +202,15 @@ Headless mode disables the web UI entirely — no home page, no quick links, no 
 sudo ./venv/bin/python run.py \--headless  
 Startup banner in headless mode:
 ```
-\============================================================  
-Rewind-Proxy started \[HEADLESS\] (local network...)  
+============================================================  
+Rewind-Proxy started [HEADLESS] (local network...)  
 Web UI disabled. Configure your browser's proxy settings:  
 Proxy host : 192.168.100.1  
 Proxy port : 8080  
-Status endpoint: http\://192.168.100.1:8080/  
-\============================================================  
+Status endpoint: http://192.168.100.1:8080/  
+============================================================  
 Status endpoint (/) — a monitoring tool or curl can hit this to confirm the proxy is alive:  
-Rewind-Proxy \[headless\] (local network — make sure port is not firewalled)  
+Rewind-Proxy [headless] (local network — make sure port is not firewalled)  
 Time : 2026-08-07 21:00:00 UTC  
 Proxy host : 192.168.100.1  
 Proxy port : 8080  
