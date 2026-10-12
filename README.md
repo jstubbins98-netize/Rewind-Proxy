@@ -7,18 +7,18 @@ The intended setup is a Linux computer plugged directly into the old computer wi
 ---
 
 ## **How It Works**
-
+```
 Old browser ── plain HTTP/1.0 ──► Rewind-Proxy :8080  
 │  
-1\. Find best Wayback snapshot  
-2\. Fetch over modern HTTPS/TLS  
-3\. Rewrite all links → back through proxy  
-4\. Strip Wayback toolbar \+ modern headers  
+1. Find best Wayback snapshot  
+2. Fetch over modern HTTPS/TLS  
+3. Rewrite all links → back through proxy  
+4. Strip Wayback toolbar \+ modern headers  
 │  
 ▼  
 Clean archived HTML served  
 over plain HTTP to old browser
-
+```
 For every request the proxy:
 
 1. Finds the closest snapshot — queries the Wayback CDX API for the nearest archived page to the date you chose, then falls back to the availability API, then falls back to a direct web.archive.org/web/TIMESTAMP/ URL.  
@@ -43,23 +43,23 @@ For every request the proxy:
 ---
 
 ## **Requirements**
-
+```
 * Python 3.10 or later  
 * pip install \-r requirements.txt (installs requests and beautifulsoup4)  
 * Internet connection on the machine running the proxy  
 * For automatic Linux ethernet setup: Linux, sudo access, and a wired port not carrying the host's default internet route
-
+```
 ---
 
 ## **Quick Start (any machine)**
-
+```
 cd rewind-proxy  
 chmod \+x setup.sh  
 ./setup.sh  
 ./venv/bin/python run.py
-
+```
 The proxy starts on 0.0.0.0:8080. Open http\://\<this-machine-ip\>:8080/ in any browser to reach the home page, or configure your browser's HTTP proxy settings to point to this machine.  
-./venv/bin/python run.py \--host 0.0.0.0 \--port 8080 \--interface enp3s0 \--headless \--debug
+`./venv/bin/python run.py --host 0.0.0.0 --port 8080 --interface enp3s0 --headless --debug`
 
 | Option | Default | Description |
 | :---- | :---- | :---- |
@@ -73,11 +73,11 @@ On Linux, Rewind-Proxy automatically selects a wired interface that is not carry
 
 Examples:  
 \# Automatically select a safe wired port  
-sudo ./venv/bin/python run.py  
+`sudo ./venv/bin/python run.py`  
 \# Use a specific wired port  
-sudo ./venv/bin/python run.py \--interface enp3s0  
+`sudo ./venv/bin/python run.py --interface enp3s0`
 \# Generic Linux host in headless mode  
-sudo ./venv/bin/python run.py \--interface eth0 \--headless
+`sudo ./venv/bin/python run.py --interface eth0 --headless`
 
 The automatic dnsmasq installer supports apt, dnf, yum, zypper, pacman, and apk.  
 ---
@@ -99,26 +99,28 @@ The Linux host runs Rewind-Proxy and connects directly to the old computer over 
 The Linux host needs an internet connection of its own — use its Wi-Fi or connect it to your router with a second ethernet cable (if your host has only one port, Wi-Fi for internet \+ ethernet for the old computer is the typical setup).
 
 ### **Step 1 — Install Rewind-Proxy on the Linux Host**
-
+```
 \# On Debian, Ubuntu, or Raspberry Pi OS:  
 sudo apt update  
 sudo apt install \-y python3-pip dnsmasq  
 git clone https\://github.com/jstubbins98-netize/Rewind-Proxy.git  
 cd rewind-proxy/rewind-proxy  
 pip3 install \-r requirements.txt
-
+```
 Rewind-Proxy installs dnsmasq automatically when it is missing and the program is running as root. Supported package managers are apt, dnf, yum, zypper, pacman, and apk.
 
 ### **Step 2 — Run the Proxy (as root for full auto-setup)**
-
-sudo ./venv/bin/python run.py  
+```
+sudo ./venv/bin/python run.py
+```  
 Running as root lets the proxy:
 
 * Assign a static IP (192.168.100.1) to the selected Linux ethernet interface automatically  
 * Start dnsmasq to hand out IP addresses via DHCP
 
 If you run without sudo, the proxy still works but prints the ip commands you need to run manually and shows them on the home page.  
-On startup you will see:  
+On startup you will see:
+```
 \============================================================  
 Rewind-Proxy started (local network — make sure port is not firewalled)  
 Open this URL in any browser:  
@@ -132,7 +134,7 @@ Linux ethernet setup enabled on eth0.
 Connect your old computer to that ethernet port.  
 The home page will show live setup instructions.  
 \============================================================
-
+```
 ### **Step 3 — Connect the Old Computer to the Linux Host**
 
 Plug one end of the ethernet cable into the old computer's network port and the other end into the Linux Host’s ethernet port.  
@@ -175,13 +177,16 @@ Browser-specific instructions:
 ### **Step 5 — Browse**
 
 With the proxy configured, type any URL in the old browser's address bar and press Enter. Rewind-Proxy will find and serve the nearest archived version from the year 2000 by default.  
-You can also open the home page directly:  
-http\://192.168.100.1:8080/  
+You can also open the home page directly:
+```
+http\://192.168.100.1:8080/
+```
 From there, use the form to browse to any site and choose any date from 1996 onwards. Quick links take you straight to classic 1990s/2000s websites.
 
 ### **Running at Boot (optional)**
 
-To start Rewind-Proxy automatically when the Linux system powers on, create a systemd service.  
+To start Rewind-Proxy automatically when the Linux system powers on, create a systemd service. 
+```
 Normal mode (home page enabled):  
 sudo nano /etc/systemd/system/rewind-proxy.service  
 \[Unit\]  
@@ -208,14 +213,15 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload  
 sudo systemctl enable rewind-proxy  
 sudo systemctl start rewind-proxy
-
+```
 ---
 
 ## **Using the Home Page (Direct Mode)**
 
 If the old browser can reach the Linux host but you'd rather not configure proxy settings, open the home page directly:
-
-http\://192.168.100.1:8080/  
+```
+http\://192.168.100.1:8080/
+```  
 Use the URL form to enter any site address and pick a date. The page is served directly through the proxy — the old browser never needs proxy settings configured, and the address bar never shows archive.org URLs.
 
 ---
@@ -225,7 +231,8 @@ Use the URL form to enter any site address and pick a date. The page is served d
 Headless mode disables the web UI entirely — no home page, no quick links, no setup guide. The proxy still works in full; you just configure the old browser's proxy settings and browse normally. The only thing served at / is a brief plain-text status block.  
 ./venv/bin/python run.py \--headless  
 sudo ./venv/bin/python run.py \--headless  
-Startup banner in headless mode:  
+Startup banner in headless mode:
+```
 \============================================================  
 Rewind-Proxy started \[HEADLESS\] (local network...)  
 Web UI disabled. Configure your browser's proxy settings:  
@@ -238,10 +245,10 @@ Rewind-Proxy \[headless\] (local network — make sure port is not firewalled)
 Time : 2026-08-07 21:00:00 UTC  
 Proxy host : 192.168.100.1  
 Proxy port : 8080  
-Pi ethernet : old computer connected at 192.168.100.12  
+Pi ethernet : old computer connected at 192.168.100.12
+```  
 /setup — returns brief plain-text proxy connection details instead of the full HTML guide.  
 Everything else is unchanged — /go, /r, and standard browser proxy mode all work exactly as in normal mode. The only difference is that the old computer cannot use the form-based home page and must have browser proxy settings configured.
-
 ### **When to use headless mode**
 
 | Scenario | Recommendation |
@@ -269,7 +276,7 @@ Everything else is unchanged — /go, /r, and standard browser proxy mode all wo
 ### **Two Usage Modes**
 
 Direct mode — browser opens the proxy's home page URL or a /go?url=... link directly. All pages are served from /r?url=\<encoded-wayback-url\> endpoints. Every link in every page is rewritten to /r?url=... so the browser stays on the proxy server and the address bar never shows archive.org.  
-Browser proxy mode — browser's HTTP proxy settings point to the Linux host. The browser sends GET http\://apple.com/ HTTP/1.0directly to the proxy. The proxy resolves this to a Wayback snapshot, fetches it, and rewrites all links as root-relative /r?url=...paths. When the browser follows a link, the path resolves back to the proxy regardless of which host the current page came from.  
+Browser proxy mode — browser's HTTP proxy settings point to the Linux host. The browser sends `GET http://apple.com/HTTP/1.0` directly to the proxy. The proxy resolves this to a Wayback snapshot, fetches it, and rewrites all links as root-relative /r?url=...paths. When the browser follows a link, the path resolves back to the proxy regardless of which host the current page came from.  
 Both modes share the same underlying fetch-and-rewrite pipeline.
 
 ### **What Gets Stripped**
