@@ -79,7 +79,8 @@ Examples:
 \# Generic Linux host in headless mode  
 `sudo ./venv/bin/python run.py --interface eth0 --headless`
 
-The automatic dnsmasq installer supports apt, dnf, yum, zypper, pacman, and apk.  
+The automatic dnsmasq installer supports apt, dnf, yum, zypper, pacman, and apk.
+
 ---
 
 ## **Linux Ethernet Setup — Full Guide**
