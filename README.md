@@ -216,7 +216,8 @@ sudo systemctl start rewind-proxy
 If the old browser can reach the Linux host but you'd rather not configure proxy settings, open the home page directly:
 
 http\://192.168.100.1:8080/  
-Use the URL form to enter any site address and pick a date. The page is served directly through the proxy — the old browser never needs proxy settings configured, and the address bar never shows archive.org URLs.  
+Use the URL form to enter any site address and pick a date. The page is served directly through the proxy — the old browser never needs proxy settings configured, and the address bar never shows archive.org URLs.
+
 ---
 
 ## **Headless Mode**
