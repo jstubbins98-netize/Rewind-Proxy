@@ -155,7 +155,7 @@ Where to find TCP/IP settings on old systems:
 * Mac OS 8/9 — Apple menu → Control Panels → TCP/IP → set "Connect via" to Ethernet, "Configure" to Manually  
 * Mac OS X 10.2–10.5 — System Preferences → Network → Built-in Ethernet → TCP/IP tab
 
-The home page at http\://192.168.100.1:8080/ will show a green "Old computer connected" banner once it sees the device on the network.
+The home page at `http://192.168.100.1:8080/` will show a green "Old computer connected" banner once it sees the device on the network.
 
 ### **Step 4 — Configure the Old Browser's Proxy Settings**
 
