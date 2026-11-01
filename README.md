@@ -287,4 +287,4 @@ The address bar shows web.archive.org URLs Make sure you are running the latest 
 
 ## **Licence**
 
-MIT — see LICENSE for details.
+MIT — see `LICENSE` for details.
