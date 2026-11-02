@@ -125,7 +125,7 @@ On startup you will see:
 ============================================================  
 Rewind-Proxy started (local network — make sure port is not firewalled)  
 Open this URL in any browser:  
->>> http\://192.168.100.1:8080/ <<<  
+>>> http://192.168.100.1:8080/ <<<  
 — OR — configure your old browser's proxy settings:  
 Proxy host : 192.168.100.1  
 Proxy port : 8080  
@@ -190,7 +190,7 @@ From there, use the form to browse to any site and choose any date from 1996 onw
 
 If the old browser can reach the Linux host but you'd rather not configure proxy settings, open the home page directly:
 ```
-http\://192.168.100.1:8080/
+http://192.168.100.1:8080/
 ```  
 Use the URL form to enter any site address and pick a date. The page is served directly through the proxy — the old browser never needs proxy settings configured, and the address bar never shows archive.org URLs.
 
@@ -240,7 +240,7 @@ Everything else is unchanged — /go, /r, and standard browser proxy mode all wo
 | proxy.py | HTTP server, request routing, two modes (direct \+ browser-proxy) |
 | rewriter.py | HTML/CSS rewriter — rewrites links, strips Wayback toolbar, adds info bar |
 | wayback.py | Wayback Machine client — snapshot resolution, HTTP fetching |
-| pi\_setup.py | Linux ethernet wizard — safe interface selection, network config, DHCP, ARP monitor |
+| pi_setup.py | Linux ethernet wizard — safe interface selection, network config, DHCP, ARP monitor |
 | config.py | All tuneable constants |
 
 ### **Two Usage Modes**
